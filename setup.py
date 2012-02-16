@@ -6,6 +6,7 @@ import os
 import sys
 from setuptools import setup
 from distutils.extension import Extension
+from Cython.Distutils import build_ext
 
 if 'setuptools.extension' in sys.modules:
     m = sys.modules['setuptools.extension']
@@ -16,7 +17,9 @@ version = open(version_py).read().strip().split('=')[-1].replace('"','')
 sources=["src/bedFile.cpp",
          "src/fileType.cpp",
          "src/gzstream.cpp",
-         "pybedtools/cbedtools.cpp"]
+         "pybedtools/cbedtools.pyx"]
+
+
 exts = [ Extension("pybedtools.cbedtools",
                    sources=sources,
                    libraries=["stdc++", 'z'],
@@ -25,14 +28,14 @@ exts = [ Extension("pybedtools.cbedtools",
                    language="c++"),
 
          Extension('pybedtools.featurefuncs',
-                   sources=sources + ["pybedtools/featurefuncs.cpp"],
+                   sources=sources + ["pybedtools/featurefuncs.pyx"],
                    libraries=["stdc++", 'z'],
                    include_dirs=["src/"],
                    library_dirs=["src/"],
                    language="c++"),
 
          Extension('pybedtools._Window',
-                    sources=['pybedtools/_Window.c'],),
+                    sources=['pybedtools/_Window.pyx'],),
         ]
 
 long_description = """
@@ -55,6 +58,7 @@ and see full documentation and tutorial at:
 
 tests_require = ['nose>=0.11', 'pyyaml']
 setup(
+        cmdclass= {'build_ext': build_ext},
         name="pybedtools",
         version=version,
         ext_modules=exts,
